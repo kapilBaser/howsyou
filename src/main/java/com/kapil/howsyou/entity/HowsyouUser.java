@@ -1,9 +1,7 @@
 package com.kapil.howsyou.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,10 +13,36 @@ import java.util.List;
 public class HowsyouUser implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+
+    private Long id;
+
     private String name;
+
     private String email;
+
+
     private String password;
+
+    private String bio;
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    private List<Post> posts;
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
 
     public String getName() {
         return name;
