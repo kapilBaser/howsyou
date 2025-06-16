@@ -1,24 +1,33 @@
 package com.kapil.howsyou.dto;
 
 import com.kapil.howsyou.entity.HowsyouUser;
-import com.kapil.howsyou.entity.Post;
+import com.kapil.howsyou.dto.PostDto;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Profile {
     private String name;
     private String email;
-    private String bio;
-    private List<Post> posts;
+    private String bio = "";
+    private List<PostDto> posts;
 
     public Profile(){}
 
 
-    public Profile(String name, String email, String bio, List<Post> posts) {
+    public Profile(String name, String email, String bio, List<PostDto> posts) {
         this.name = name;
         this.email = email;
         this.bio = bio;
+        this.posts = posts;
+    }
+
+    public List<PostDto> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<PostDto> posts) {
         this.posts = posts;
     }
 
@@ -47,7 +56,16 @@ public class Profile {
     }
 
     public static Profile mapToProfile(HowsyouUser howsyouUser){
-        return new Profile(howsyouUser.getName(), howsyouUser.getEmail(), howsyouUser.getBio(), howsyouUser.getPosts());
+        List<PostDto> postDtos = new ArrayList<>();
+        howsyouUser.getPosts().forEach(post -> {
+            List<CommentDto> comments = new ArrayList<>();
+            post.getComments().forEach(comment -> {
+                comments.add(CommentDto.mapToCommentDto(comment));
+            });
+
+            postDtos.add(PostDto.mapToPostDto(post, comments));
+        });
+        return new Profile(howsyouUser.getName(), howsyouUser.getEmail(), howsyouUser.getBio(), postDtos);
     }
 
 }

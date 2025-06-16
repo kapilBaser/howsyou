@@ -8,25 +8,36 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class HowsyouUser implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long id;
-
     private String name;
-
     private String email;
-
-
     private String password;
-
     private String bio;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<Post> posts;
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    private List<Comment> comments;
+
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
 
     public List<Post> getPosts() {
         return posts;
@@ -104,5 +115,11 @@ public class HowsyouUser implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean equals(HowsyouUser howsyouUser) {
+        if(this.getEmail().equals(howsyouUser.getEmail()))
+            return true;
+        return false;
     }
 }

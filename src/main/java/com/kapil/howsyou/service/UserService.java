@@ -25,6 +25,10 @@ public class UserService implements UserDetailsService {
         return userRepository.save(howsyouUser);
     }
 
+    public HowsyouUser findByEmail(String email){
+        return userRepository.findByEmail(email).isPresent() ? userRepository.findByEmail(email).get() : null;
+    }
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
