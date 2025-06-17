@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -21,10 +22,10 @@ public class HowsyouUser implements UserDetails {
     private String bio;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
-    private List<Post> posts;
+    private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
 
     public void setId(Long id) {
@@ -121,5 +122,16 @@ public class HowsyouUser implements UserDetails {
         if(this.getEmail().equals(howsyouUser.getEmail()))
             return true;
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "HowsyouUser{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", bio='" + bio + '\'' +
+                '}';
     }
 }

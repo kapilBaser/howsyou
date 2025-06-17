@@ -3,6 +3,9 @@ package com.kapil.howsyou.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 public class Comment {
     @Id
@@ -17,6 +20,29 @@ public class Comment {
     @JoinColumn(name = "postId")
     @JsonIgnore
     private Post post;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
+    private List<Comment> commentReplies = new ArrayList<>();
+
+    @ManyToOne
+    @JsonIgnore
+    private Comment comment;
+
+    public List<Comment> getCommentReplies() {
+        return commentReplies;
+    }
+
+    public void setCommentReplies(List<Comment> commentReplies) {
+        this.commentReplies = commentReplies;
+    }
+
+    public Comment getComment() {
+        return comment;
+    }
+
+    public void setComment(Comment comment) {
+        this.comment = comment;
+    }
 
     public Long getId() {
         return id;

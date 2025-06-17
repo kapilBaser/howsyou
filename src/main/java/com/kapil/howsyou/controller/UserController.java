@@ -1,5 +1,6 @@
 package com.kapil.howsyou.controller;
 
+import com.kapil.howsyou.dto.CommentDto;
 import com.kapil.howsyou.dto.PostDto;
 import com.kapil.howsyou.dto.Profile;
 import com.kapil.howsyou.entity.Comment;
@@ -8,11 +9,13 @@ import com.kapil.howsyou.entity.Post;
 import com.kapil.howsyou.service.CommentService;
 import com.kapil.howsyou.service.PostService;
 import com.kapil.howsyou.service.UserService;
+import com.kapil.howsyou.utils.AuthenticatedUser;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +35,9 @@ public class UserController {
 
     @Autowired
     private CommentService commentService;
+
+    @Autowired
+    private AuthenticatedUser authenticatedUser;
 
     @GetMapping("/profile/")
     public Profile getLoggedInUserProfile() {
@@ -107,6 +113,7 @@ public class UserController {
             commentedPost.getComments().add(comment);
             userService.save(howsyouUser);
             postService.save(commentedPost);
+            commentedPost.setComments(commentService.findByPostIdAndCommentIsNull(commentedPost.getId()));
             return PostDto.mapToPostDto(commentedPost);
         }
         return null;
@@ -123,6 +130,26 @@ public class UserController {
         Post post = postService.findPostById(postId);
         return PostDto.mapToPostDto(post);
     }
+
+    @PostMapping("/comment/{commentId}/reply")
+    public PostDto addReplyToComment(@PathVariable long commentId, @RequestBody Comment repliedComment){
+        HowsyouUser user = authenticatedUser.getAuthenticatedUser();
+        Comment comment = commentService.findById(commentId);
+        if(comment != null){
+            repliedComment.setAuthor(user);
+            repliedComment.setComment(comment);
+            repliedComment.setPost(comment.getPost());
+            comment.getCommentReplies().add(repliedComment);
+            commentService.save(comment);
+            Post post = comment.getPost();
+
+            post.setComments(commentService.findByPostIdAndCommentIsNull(post.getId()));
+            return PostDto.mapToPostDto(post);
+        }
+        return null;
+    }
+
+
 
     @PostMapping("/{postId}/like")
     public PostDto likePost(@PathVariable long postId){
