@@ -6,10 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 public class HowsyouUser implements UserDetails {
@@ -19,7 +16,7 @@ public class HowsyouUser implements UserDetails {
     private String name;
     private String email;
     private String password;
-    private String bio;
+    private String bio = "";
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<Post> posts = new ArrayList<>();
@@ -27,6 +24,32 @@ public class HowsyouUser implements UserDetails {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "user_following",
+            joinColumns = @JoinColumn(name = "follower_id"),
+            inverseJoinColumns = @JoinColumn(name  = "following_id")
+    )
+    private Set<HowsyouUser> following = new HashSet<>();
+
+    @ManyToMany(mappedBy = "following")
+    private Set<HowsyouUser> followers = new HashSet<>();
+
+    public Set<HowsyouUser> getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(Set<HowsyouUser> following) {
+        this.following = following;
+    }
+
+    public Set<HowsyouUser> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(Set<HowsyouUser> followers) {
+        this.followers = followers;
+    }
 
     public void setId(Long id) {
         this.id = id;

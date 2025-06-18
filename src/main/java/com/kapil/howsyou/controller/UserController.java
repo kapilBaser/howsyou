@@ -170,4 +170,19 @@ public class UserController {
         return PostDto.mapToPostDto(post);
     }
 
+    @PostMapping("/follow/{userId}")
+    public Profile followUser(@PathVariable long userId){
+        HowsyouUser loggedInUser = authenticatedUser.getAuthenticatedUser();
+        HowsyouUser followedUser = userService.findByUserId(userId);
+        if(followedUser != null){
+            if(loggedInUser.getFollowing().contains(followedUser)){
+                loggedInUser.getFollowing().remove(followedUser);
+            }else{
+                loggedInUser.getFollowing().add(followedUser);
+            }
+            userService.save(loggedInUser);
+        }
+        return Profile.mapToProfile(loggedInUser);
+    }
+
 }
