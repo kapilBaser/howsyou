@@ -2,6 +2,7 @@ package com.kapil.howsyou.dto;
 
 import com.kapil.howsyou.entity.Post;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,14 +11,24 @@ public class PostDto {
     private String author;
     private Long likes = 0l;
     private List<CommentDto> comments;
+    private LocalDateTime createdAt;
 
     public PostDto() {}
 
-    public PostDto(String content, String author, long likes, List<CommentDto> comments) {
+    public PostDto(String content, String author, long likes, LocalDateTime createdAt, List<CommentDto> comments) {
         this.content = content;
         this.author = author;
         this.likes = likes;
+        this.createdAt = createdAt;
         this.comments = comments;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Long getLikes() {
@@ -55,11 +66,11 @@ public class PostDto {
     public static PostDto mapToPostDto(Post post){
         List<CommentDto> comments = new ArrayList<>();
         post.getComments().forEach(comment -> comments.add(CommentDto.mapToCommentDto(comment)));
-        return new PostDto(post.getContent(), post.getAuthor().getName(), post.getLikes(), comments);
+        return new PostDto(post.getContent(), post.getAuthor().getName(), post.getLikes(), post.getCreatedAt(), comments);
     }
 
     public static PostDto mapToPostDto(Post post, List<CommentDto> comments){
-        return new PostDto(post.getContent(), post.getAuthor().getName(), post.getLikes(), comments);
+        return new PostDto(post.getContent(), post.getAuthor().getName(), post.getLikes(), post.getCreatedAt(), comments);
     }
 
 }

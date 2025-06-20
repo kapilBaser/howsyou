@@ -3,6 +3,7 @@ package com.kapil.howsyou.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +14,7 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String content;
+    private LocalDateTime createdAt;
     private long likes = 0l;
 
     @ManyToOne
@@ -30,6 +32,14 @@ public class Post {
             inverseJoinColumns = @JoinColumn(name = "userId")
     )
     private Set<HowsyouUser> likedBy;
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
     public Set<HowsyouUser> getLikedBy() {
         return likedBy;

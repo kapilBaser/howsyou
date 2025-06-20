@@ -1,5 +1,6 @@
 package com.kapil.howsyou.utils;
 
+import com.kapil.howsyou.dto.LoginDto;
 import com.kapil.howsyou.entity.HowsyouUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -27,11 +28,11 @@ public class JwtUtils {
     }
 
 
-    public String generateToken(HowsyouUser howsyouUser){
+    public String generateToken(LoginDto loginDto){
         return Jwts.builder()
-                .setSubject(howsyouUser.getEmail())
+                .setSubject(loginDto.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + ((1000 * 60) * 5)))
+                .setExpiration(new Date(System.currentTimeMillis() + ((1000 * 60) * 20)))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }

@@ -49,7 +49,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/h2-console/**","/api/v1/auth/**").permitAll()
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/h2-console/**","/api/v1/auth/**", "/error").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

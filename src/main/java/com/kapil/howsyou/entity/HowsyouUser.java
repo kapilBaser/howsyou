@@ -2,6 +2,12 @@ package com.kapil.howsyou.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +19,16 @@ public class HowsyouUser implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotBlank(message = "Username is required")
+    @Size(min = 3, message = "Username must be at least 3 characters")
+    private String username;
+
+    @Size(min = 3, message = "Name must be at least 3 characters")
     private String name;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
     private String email;
     private String password;
     private String bio = "";
@@ -34,6 +49,10 @@ public class HowsyouUser implements UserDetails {
 
     @ManyToMany(mappedBy = "following")
     private Set<HowsyouUser> followers = new HashSet<>();
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public Set<HowsyouUser> getFollowing() {
         return following;
@@ -114,7 +133,7 @@ public class HowsyouUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return username;
     }
 
     @Override

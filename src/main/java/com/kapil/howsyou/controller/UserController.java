@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -48,9 +49,7 @@ public class UserController {
 
     @PutMapping("/profile/")
     public Profile updateProfile(@RequestBody Profile profile){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        HowsyouUser howsyouUser = (HowsyouUser) userService.loadUserByUsername(username);
+        HowsyouUser howsyouUser = authenticatedUser.getAuthenticatedUser();
         howsyouUser.setName(profile.getName());
         howsyouUser.setBio(profile.getBio());
         howsyouUser.setEmail(profile.getEmail());
@@ -60,19 +59,18 @@ public class UserController {
 
     @GetMapping("/post")
     public List<Post> getPosts(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        HowsyouUser howsyouUser = (HowsyouUser) userService.loadUserByUsername(authentication.getName());
+        HowsyouUser howsyouUser = authenticatedUser.getAuthenticatedUser();
         return howsyouUser.getPosts();
     }
 
     @PostMapping("/post")
     public HowsyouUser addPost(@RequestBody Post post){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        HowsyouUser howsyouUser = (HowsyouUser) userService.loadUserByUsername(authentication.getName());
+        HowsyouUser howsyouUser = authenticatedUser.getAuthenticatedUser();
         List<Post> userPosts = howsyouUser.getPosts();
         if(userPosts == null)
             userPosts = new ArrayList<>();
         post.setAuthor(howsyouUser);
+        post.setCreatedAt(LocalDateTime.now());
         userPosts.add(post);
         howsyouUser.setPosts(userPosts);
         userService.save(howsyouUser);
@@ -103,8 +101,7 @@ public class UserController {
 
     @PostMapping("/comment/{postId}")
     public PostDto addComment(@PathVariable long postId, @RequestBody Comment comment){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        HowsyouUser howsyouUser = userService.findByEmail(authentication.getName());
+        HowsyouUser howsyouUser = authenticatedUser.getAuthenticatedUser();
         if(howsyouUser != null){
             Post commentedPost = postService.findPostById(postId);
             comment.setAuthor(howsyouUser);
@@ -153,17 +150,15 @@ public class UserController {
 
     @PostMapping("/{postId}/like")
     public PostDto likePost(@PathVariable long postId){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String authenticatedUserEmail = authentication.getName();
-        HowsyouUser authenticatedUser = userService.findByEmail(authenticatedUserEmail);
+        HowsyouUser user = authenticatedUser.getAuthenticatedUser();
         Post post = postService.findPostById(postId);
         Set<HowsyouUser> likedBy = post.getLikedBy();
         
-        if(likedBy.contains(authenticatedUser)){
-            likedBy.remove(authenticatedUser);
+        if(likedBy.contains(user)){
+            likedBy.remove(user);
             post.setLikes(post.getLikes()-1);
         }else{
-            likedBy.add(authenticatedUser);
+            likedBy.add(user);
             post.setLikes(post.getLikes()+1);
         }
         postService.save(post);
@@ -174,7 +169,10 @@ public class UserController {
     public Profile followUser(@PathVariable long userId){
         HowsyouUser loggedInUser = authenticatedUser.getAuthenticatedUser();
         HowsyouUser followedUser = userService.findByUserId(userId);
+
         if(followedUser != null){
+            if(loggedInUser.getId() == followedUser.getId())
+                return null;
             if(loggedInUser.getFollowing().contains(followedUser)){
                 loggedInUser.getFollowing().remove(followedUser);
             }else{
