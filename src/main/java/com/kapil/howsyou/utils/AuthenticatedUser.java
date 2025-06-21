@@ -14,15 +14,13 @@ public class AuthenticatedUser {
     @Autowired
     private UserService userService;
 
-
-
     public HowsyouUser getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        if(email != null){
-            HowsyouUser user = (HowsyouUser) authentication.getPrincipal();
-            System.out.println(user);
-            return userService.findByEmail(email);
+        String username = authentication.getName();
+        if(username != null){
+            if(username.contains("@"))
+                return userService.findByEmail(username);
+            return userService.findByUsername(username);
         }
         return null;
     }

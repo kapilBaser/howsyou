@@ -64,17 +64,12 @@ public class UserController {
     }
 
     @PostMapping("/post")
-    public HowsyouUser addPost(@RequestBody Post post){
+    public PostDto addPost(@RequestBody Post post){
         HowsyouUser howsyouUser = authenticatedUser.getAuthenticatedUser();
-        List<Post> userPosts = howsyouUser.getPosts();
-        if(userPosts == null)
-            userPosts = new ArrayList<>();
         post.setAuthor(howsyouUser);
         post.setCreatedAt(LocalDateTime.now());
-        userPosts.add(post);
-        howsyouUser.setPosts(userPosts);
-        userService.save(howsyouUser);
-        return howsyouUser;
+        postService.save(post);
+        return PostDto.mapToPostDto(post);
     }
 
     @PutMapping("/post")
